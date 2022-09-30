@@ -1,12 +1,16 @@
-import Module.TP5_5023method_RCE;
-import Module.TP5_invokefunction_RCE;
+import Module.*;
 
 import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 /**
- * 作者：Nokali
+ * -----NokaliAttackFramework-----
+ *
+ * 漏洞信息来源：https://vulhub.org/
+ *
+ * 工具作者：Nokali
+ *
  * 主程序，包含图形界面操作，以及调用各模块
  */
 
@@ -27,15 +31,22 @@ public class Main {
         }
 
         String[] exp= new String[]{
+                "请选择漏洞模块",
                 "TP5_invokefunction_RCE",
                 "TP5_5023method_RCE",
-                "Test"
+                "TP2_RCE",
+                "S2_013_RCE",
+                "S2_001_RCE",
+                "*TEST*"
         };
+
         JComboBox explist=new JComboBox(exp);
         explist.setBounds(20,25,200,30);
 
+        JLabel assistance_label=new JLabel("");
         JLabel target_label = new JLabel("URL:");
         JTextField target_text = new JTextField("");
+        assistance_label.setBounds(30,60,500,30);
         target_label.setBounds(30, 120, 50, 30);
         target_text.setBounds(80, 120, 250, 30);    //URL提示标签和URL输入框
 
@@ -56,6 +67,7 @@ public class Main {
         execute.setBounds(350, 170, 120, 30);
 
         f.add(explist);
+        f.add(assistance_label);
         f.add(target_label);
         f.add(target_text);
         f.add(cmd_label);
@@ -68,6 +80,29 @@ public class Main {
         f.setVisible(true);
         //图形界面绘制完成
         //--------------------------------------------------------
+
+        explist.addActionListener(new ActionListener() {    //输出不同模块相应的提示
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                switch (explist.getSelectedItem().toString()){
+                    case "TP2_RCE", "TP5_5023method_RCE","TP5_invokefunction_RCE" ->{
+                        assistance_label.setText("目标URL格式例如http://xxx.com");
+                    }
+                    case "S2_013_RCE" -> {
+                        assistance_label.setText("目标URL格式例如http://xxx.com/link.action");
+                    }
+                    case "S2_001_RCE" -> {
+                        assistance_label.setText("目标URL格式例如http://xxx.com/login.action");
+                    }
+                    case "*TEST*" -> {
+                        assistance_label.setText("（请勿使用）仅支持写入webshell");
+                    }
+                    default -> {
+                        assistance_label.setText("");
+                    }
+                }
+            }
+        });
 
         submit.addActionListener(new ActionListener() {
             @Override
@@ -99,14 +134,50 @@ public class Main {
                         }
                         output.append(String.format("%n"));
                     }
-                    case "Test" -> {
-                        output.append("[*]Test.");
+                    case "TP2_RCE" -> {
+                        output.append("[*]执行TP2_RCE模块中，执行模式为：检测");
+                        output.append(String.format("%n"));
+                        Boolean result;
+                        String targeturl=target_text.getText();
+                        result= TP2_RCE.check(targeturl);
+                        if(result){
+                            output.append("[+]检测成功，目标存在远程命令执行漏洞");
+                        }else{
+                            output.append("[-]未检测到漏洞");
+                        }
+                        output.append(String.format("%n"));
+                    }
+                    case "S2_013_RCE" -> {
+                        output.append("[*]执行S2_013_RCE模块中，执行模式为：检测");
+                        output.append(String.format("%n"));
+                        Boolean result;
+                        String targeturl=target_text.getText();
+                        result= S2_013_RCE.check(targeturl);
+                        if(result){
+                            output.append("[+]检测成功，目标存在远程命令执行漏洞");
+                        }else{
+                            output.append("[-]未检测到漏洞");
+                        }
+                        output.append(String.format("%n"));
+                    }
+                    case "S2_001_RCE" -> {
+                        output.append("[*]执行S2_001_RCE模块中，执行模式为：检测");
+                        output.append(String.format("%n"));
+                        Boolean result;
+                        String targeturl=target_text.getText();
+                        result= S2_001_RCE.check(targeturl);
+                        if(result){
+                            output.append("[+]检测成功，目标存在远程命令执行漏洞");
+                        }else{
+                            output.append("[-]未检测到漏洞");
+                        }
                         output.append(String.format("%n"));
                     }
                     default -> {
                         output.append("[-]ERROR.");
                         output.append(String.format("%n"));
                     }
+
                 }
             }
         });
@@ -139,9 +210,48 @@ public class Main {
                         output.append(result);
                         output.append(String.format("%n"));
                     }
+                    case "TP2_RCE" -> {
+                        output.append("[*]执行TP2_RCE模块中，执行模式为：利用");
+                        output.append(String.format("%n"));
+                        String result;
+                        String targeturl=target_text.getText();
+                        String cmd=cmd_text.getText();
+                        result= TP2_RCE.exploit(targeturl,cmd);
+                        output.append("[+]命令执行回显：");
+                        output.append(String.format("%n"));
+                        output.append(result);
+                        output.append(String.format("%n"));
+                    }
+                    case "S2_013_RCE" -> {
+                        output.append("[*]执行S2_013_RCE模块中，执行模式为：利用");
+                        output.append(String.format("%n"));
+                        String result;
+                        String targeturl=target_text.getText();
+                        String cmd=cmd_text.getText();
+                        result= S2_013_RCE.exploit(targeturl,cmd);
+                        output.append("[+]命令执行回显：");
+                        output.append(String.format("%n"));
+                        output.append(result);
+                        output.append(String.format("%n"));
+                    }
+                    case "S2_001_RCE" -> {
+                        output.append("[*]执行S2_001_RCE模块中，执行模式为：利用");
+                        output.append(String.format("%n"));
+                        String result;
+                        String targeturl=target_text.getText();
+                        String cmd=cmd_text.getText();
+                        result= S2_001_RCE.exploit(targeturl,cmd);
+                        output.append("[+]命令执行回显：");
+                        output.append(String.format("%n"));
+                        output.append(result);
+                        output.append(String.format("%n"));
+                    }
+                    default -> {
+                        output.append("[-]ERROR.");
+                        output.append(String.format("%n"));
+                    }
                 }
             }
         });
-
     }
 }

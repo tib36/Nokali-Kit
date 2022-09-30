@@ -9,6 +9,10 @@ import Framework.HTTPinterface;
  * 其版本5中，由于没有正确处理控制器名，
  * 导致在网站没有开启强制路由的情况下（即默认情况下）可以执行任意方法，
  * 从而导致远程命令执行漏洞。
+ * 参考链接：
+ * http://www.thinkphp.cn/topic/60400.html
+ * http://www.thinkphp.cn/topic/60390.html
+ * https://xz.aliyun.com/t/3570
  */
 
 public class TP5_invokefunction_RCE {

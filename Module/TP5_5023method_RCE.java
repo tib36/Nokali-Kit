@@ -9,6 +9,8 @@ import Framework.HTTPinterface;
  * 其5.0.23以前的版本中，获取method的方法中没有正确处理方法名，
  * 导致攻击者可以调用Request类任意方法并构造利用链，
  * 从而导致远程代码执行漏洞。
+ * 参考链接：
+ * https://github.com/top-think/framework/commit/4a4b5e64fa4c46f851b4004005bff5f3196de003
  */
 
 public class TP5_5023method_RCE {
