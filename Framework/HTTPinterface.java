@@ -4,6 +4,8 @@ import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * 实现各项操作的函数定义
@@ -44,6 +46,59 @@ public class HTTPinterface {
 
             HttpURLConnection connection=(HttpURLConnection) url.openConnection();
             connection.setRequestMethod("POST");
+            connection.setDoInput(true);
+            connection.setDoOutput(true);
+
+            connection.connect();
+            OutputStreamWriter writer=new OutputStreamWriter(connection.getOutputStream(), StandardCharsets.UTF_8);
+
+            writer.write(postdata);
+            writer.flush();
+            StringBuilder sbf=new StringBuilder();
+            String strRead=null;
+
+            InputStream is=connection.getInputStream();
+            BufferedReader reader=new BufferedReader(new InputStreamReader(is));
+
+            while((strRead=reader.readLine())!=null){
+                sbf.append(strRead);
+                sbf.append(String.format("%n"));
+            }
+            reader.close();
+            connection.disconnect();
+            String results=sbf.toString();
+            return results;
+        } catch (IOException ex) {
+            throw new RuntimeException(ex);
+        }
+    }
+
+    public static String OPTIONS(String inputurl){    //获取目标服务器支持的请求方法
+        try {
+            String results=null;
+            URL url = new URL(inputurl);
+            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+            connection.setRequestMethod("OPTIONS");
+            connection.connect();
+            Map headers = connection.getHeaderFields();
+            Set<String> keys = headers.keySet();
+            for( String key : keys ){
+                String val = connection.getHeaderField(key);
+                results=results+(key+"    "+val);
+            }
+            return results;
+        } catch (IOException ex) {
+            throw new RuntimeException(ex);
+        }
+    }
+
+    public static String PUT(String inputurl,String postdata){    //使用方法类似于POST
+        try {
+            String targeturl=inputurl;
+            URL url=new URL(targeturl);
+
+            HttpURLConnection connection=(HttpURLConnection) url.openConnection();
+            connection.setRequestMethod("PUT");
             connection.setDoInput(true);
             connection.setDoOutput(true);
 

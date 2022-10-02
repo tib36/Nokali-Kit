@@ -37,7 +37,8 @@ public class Main {
                 "TP2_RCE",
                 "S2_013_RCE",
                 "S2_001_RCE",
-                "*TEST*"
+                "Flask_SSTI_RCE",
+                "Tomcat_PUT_RCE"
         };
 
         JComboBox explist=new JComboBox(exp);
@@ -94,8 +95,11 @@ public class Main {
                     case "S2_001_RCE" -> {
                         assistance_label.setText("目标URL格式例如http://xxx.com/login.action");
                     }
-                    case "*TEST*" -> {
-                        assistance_label.setText("（请勿使用）仅支持写入webshell");
+                    case "Flask_SSTI_RCE" -> {
+                        assistance_label.setText("该模块需要输入参数名，目标URL格式例如http://xxx.com/?xxx=");
+                    }
+                    case "Tomcat_PUT_RCE" -> {
+                        assistance_label.setText("仅支持写入webshell，目标URL格式例如http://xxx.com");
                     }
                     default -> {
                         assistance_label.setText("");
@@ -173,6 +177,32 @@ public class Main {
                         }
                         output.append(String.format("%n"));
                     }
+                    case "Flask_SSTI_RCE" -> {
+                        output.append("[*]执行Flask_SSTI_RCE模块中，执行模式为：检测");
+                        output.append(String.format("%n"));
+                        Boolean result;
+                        String targeturl=target_text.getText();
+                        result= Flask_SSTI_RCE.check(targeturl);
+                        if(result){
+                            output.append("[+]检测成功，目标存在远程命令执行漏洞");
+                        }else{
+                            output.append("[-]未检测到漏洞");
+                        }
+                        output.append(String.format("%n"));
+                    }
+                    case "Tomcat_PUT_RCE" -> {
+                        output.append("[*]执行Tomcat_PUT_RCE模块中，执行模式为：检测");
+                        output.append(String.format("%n"));
+                        Boolean result;
+                        String targeturl=target_text.getText();
+                        result= Tomcat_PUT_RCE.check(targeturl);
+                        if(result){
+                            output.append("[+]检测成功，目标存在远程命令执行漏洞");
+                        }else{
+                            output.append("[-]未检测到漏洞");
+                        }
+                        output.append(String.format("%n"));
+                    }
                     default -> {
                         output.append("[-]ERROR.");
                         output.append(String.format("%n"));
@@ -241,6 +271,30 @@ public class Main {
                         String targeturl=target_text.getText();
                         String cmd=cmd_text.getText();
                         result= S2_001_RCE.exploit(targeturl,cmd);
+                        output.append("[+]命令执行回显：");
+                        output.append(String.format("%n"));
+                        output.append(result);
+                        output.append(String.format("%n"));
+                    }
+                    case "Flask_SSTI_RCE" -> {
+                        output.append("[*]执行Flask_SSTI_RCE模块中，执行模式为：利用");
+                        output.append(String.format("%n"));
+                        String result;
+                        String targeturl=target_text.getText();
+                        String cmd=cmd_text.getText();
+                        result= Flask_SSTI_RCE.exploit(targeturl,cmd);
+                        output.append("[+]命令执行回显：");
+                        output.append(String.format("%n"));
+                        output.append(result);
+                        output.append(String.format("%n"));
+                    }
+                    case "Tomcat_PUT_RCE" -> {
+                        output.append("[*]执行Tomcat_PUT_RCE模块中，执行模式为：利用");
+                        output.append(String.format("%n"));
+                        String result;
+                        String targeturl=target_text.getText();
+                        String cmd=cmd_text.getText();
+                        result= Tomcat_PUT_RCE.exploit(targeturl);    //仅支持GETSHELL，故只有URL参数
                         output.append("[+]命令执行回显：");
                         output.append(String.format("%n"));
                         output.append(result);
