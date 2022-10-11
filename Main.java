@@ -37,6 +37,8 @@ public class Main {
                 "TP2_RCE",
                 "S2_013_RCE",
                 "S2_001_RCE",
+                "S2_008_RCE",
+                "S2_053_RCE",
                 "Flask_SSTI_RCE",
                 "Tomcat_PUT_RCE"
         };
@@ -91,6 +93,12 @@ public class Main {
                     }
                     case "S2_013_RCE" -> {
                         assistance_label.setText("目标URL格式例如http://xxx.com/link.action");
+                    }
+                    case "S2_008_RCE" -> {
+                        assistance_label.setText("目标URL格式例如http://xxx.com/devmode.action");
+                    }
+                    case "S2_053_RCE" -> {
+                        assistance_label.setText("目标URL格式例如http://xxx.com/hello.action");
                     }
                     case "S2_001_RCE" -> {
                         assistance_label.setText("目标URL格式例如http://xxx.com/login.action");
@@ -203,6 +211,32 @@ public class Main {
                         }
                         output.append(String.format("%n"));
                     }
+                    case "S2_008_RCE" -> {
+                        output.append("[*]执行S2_008_RCE模块中，执行模式为：检测");
+                        output.append(String.format("%n"));
+                        Boolean result;
+                        String targeturl=target_text.getText();
+                        result= S2_008_RCE.check(targeturl);
+                        if(result){
+                            output.append("[+]检测成功，目标存在远程命令执行漏洞");
+                        }else{
+                            output.append("[-]未检测到漏洞");
+                        }
+                        output.append(String.format("%n"));
+                    }
+                    case "S2_053_RCE" -> {
+                        output.append("[*]执行S2_053_RCE模块中，执行模式为：检测");
+                        output.append(String.format("%n"));
+                        Boolean result;
+                        String targeturl=target_text.getText();
+                        result= S2_053_RCE.check(targeturl);
+                        if(result){
+                            output.append("[+]检测成功，目标存在远程命令执行漏洞");
+                        }else{
+                            output.append("[-]未检测到漏洞");
+                        }
+                        output.append(String.format("%n"));
+                    }
                     default -> {
                         output.append("[-]ERROR.");
                         output.append(String.format("%n"));
@@ -295,6 +329,30 @@ public class Main {
                         String targeturl=target_text.getText();
                         String cmd=cmd_text.getText();
                         result= Tomcat_PUT_RCE.exploit(targeturl);    //仅支持GETSHELL，故只有URL参数
+                        output.append("[+]命令执行回显：");
+                        output.append(String.format("%n"));
+                        output.append(result);
+                        output.append(String.format("%n"));
+                    }
+                    case "S2_008_RCE" -> {
+                        output.append("[*]执行S2_008_RCE模块中，执行模式为：利用");
+                        output.append(String.format("%n"));
+                        String result;
+                        String targeturl=target_text.getText();
+                        String cmd=cmd_text.getText();
+                        result= S2_008_RCE.exploit(targeturl,cmd);
+                        output.append("[+]命令执行回显：");
+                        output.append(String.format("%n"));
+                        output.append(result);
+                        output.append(String.format("%n"));
+                    }
+                    case "S2_053_RCE" -> {
+                        output.append("[*]执行S2_053_RCE模块中，执行模式为：利用");
+                        output.append(String.format("%n"));
+                        String result;
+                        String targeturl=target_text.getText();
+                        String cmd=cmd_text.getText();
+                        result= S2_053_RCE.exploit(targeturl,cmd);
                         output.append("[+]命令执行回显：");
                         output.append(String.format("%n"));
                         output.append(result);
